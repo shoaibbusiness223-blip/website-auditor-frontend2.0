@@ -113,16 +113,17 @@ export function PdfExportButton({ plan, auditId }: { plan: Plan; auditId: string
   }
 
   return (
-    
+    <a
       href={`${process.env.NEXT_PUBLIC_API_URL}/api/audit/${auditId}/pdf`}
       target="_blank"
       rel="noopener noreferrer"
       className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-slate-300 transition hover:border-white/20 hover:text-white"
     >
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
       Export PDF
     </a>
   )
-}
