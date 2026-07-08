@@ -90,7 +90,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   if (!json || json.success !== true) {
-    const message = json && 'error' in json ? json.error : `Request failed (${res.status})`
+    const message = (json && 'error' in json && typeof json.error === 'string' && json.error)
+    || `Request failed (${res.status})`
     const code = json && 'code' in json ? json.code : undefined
 
     // Invalid/expired session — purge local token so AuthContext can react
