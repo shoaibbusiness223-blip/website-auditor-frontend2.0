@@ -77,11 +77,13 @@ export default function SignupPage() {
     setSubmitting(true)
     setSuccessMessage('')
     try {
-      await signup(email.trim(), password, fullName.trim())
-      setSuccessMessage('Account created! Redirecting...')
-      const pendingUrl = sessionStorage.getItem('growthauditor_pending_url')
-      sessionStorage.removeItem('growthauditor_pending_url')
-      router.push(pendingUrl ? `/dashboard?url=${encodeURIComponent(pendingUrl)}` : '/dashboard')
+
+      const result = await signup(email.trim(), password, fullName.trim())
+      setSuccessMessage('Account created! Check your email for a code...')
+      router.push(`/auth/verify-otp?user_id=${result.user.id}&email=${encodeURIComponent(email)}&type=email_verification`)
+
+      sessionStorage.setItem('pending_session', JSON.stringify(result.session))
+
     } catch (err) {
       const message = err instanceof ApiClientError ? err.message : 'Signup failed. Please try again.'
       setErrors({ form: message })

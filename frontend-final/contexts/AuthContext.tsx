@@ -18,7 +18,7 @@ interface AuthContextValue {
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
-  signup: (email: string, password: string, fullName: string) => Promise<void>
+  signup: (email: string, password: string, fullName: string) => Promise<{ user: { id: string; email: string }; session: unknown }>
   logout: () => void
 }
 
@@ -65,16 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setTokens(result.session.access_token, result.session.refresh_token)
     setUser(result.user)
   }, [])
-
   const signup = useCallback(async (email: string, password: string, fullName: string) => {
     const result = await signupRequest(email, password, fullName)
-    // Supabase signup returns a session immediately when email confirmation
-    // is disabled. If confirmation is required, session may be absent —
-    // handle both cases gracefully.
-    if (result.session?.access_token) {
-      setTokens(result.session.access_token, result.session.refresh_token)
-      setUser(result.user)
-    }
+    // Don't set user/tokens yet — wait until OTP verification completes.
+    // Just return the result so the signup page can redirect to /auth/verify-otp.
+    return result
   }, [])
 
   const logout = useCallback(() => {

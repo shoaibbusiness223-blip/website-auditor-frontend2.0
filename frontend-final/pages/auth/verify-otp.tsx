@@ -105,6 +105,15 @@ export default function VerifyOtpPage() {
     }
   }
 
+  if (type === 'email_verification') {
+    const pendingSession = sessionStorage.getItem('pending_session')
+    if (pendingSession) {
+      const session = JSON.parse(pendingSession)
+      localStorage.setItem('growthauditor_access_token', session.access_token)
+      sessionStorage.removeItem('pending_session')
+    }
+  }
+
   async function handleResend() {
     if (!user_id || !email || !type || resendCooldown > 0) return
     setResending(true)
