@@ -76,7 +76,7 @@ export default function VerifyOtpPage() {
     setError('')
 
     try {
-      const endpoint = type === 'email_verification' ? '/api/auth/verify-email' : '/api/auth/verify-2fa'
+      const endpoint = '/api/auth/verify-email'
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,7 +93,7 @@ export default function VerifyOtpPage() {
 
       setSuccess(type === 'email_verification' ? 'Email verified! Redirecting...' : 'Login verified!')
 
-      if (type === 'login_2fa' && data.data?.session?.access_token) {
+      if (data.data?.session?.access_token) {
         localStorage.setItem('growthauditor_access_token', data.data.session.access_token)
       }
 
@@ -122,8 +122,8 @@ export default function VerifyOtpPage() {
       const res = await fetch(`${API_URL}/api/auth/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id, email, type }),
-      })
+        body: JSON.stringify({ email }),
+
       const data = await res.json()
       if (data.success) {
         setResendCooldown(60)

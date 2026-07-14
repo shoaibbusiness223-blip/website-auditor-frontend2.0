@@ -78,11 +78,9 @@ export default function SignupPage() {
     setSuccessMessage('')
     try {
 
-      const result = await signup(email.trim(), password, fullName.trim())
-      setSuccessMessage('Account created! Check your email for a code...')
-      router.push(`/auth/verify-otp?user_id=${result.user.id}&email=${encodeURIComponent(email)}&type=email_verification`)
+      await signup(email.trim(), password, fullName.trim())
+router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}`)
 
-      sessionStorage.setItem('pending_session', JSON.stringify(result.session))
 
     } catch (err) {
       const message = err instanceof ApiClientError ? err.message : 'Signup failed. Please try again.'
