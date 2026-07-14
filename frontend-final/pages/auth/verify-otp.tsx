@@ -80,7 +80,7 @@ export default function VerifyOtpPage() {
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id, code: fullCode }),
+        body: JSON.stringify({ email, code: fullCode }),
       })
       const data = await res.json()
 
