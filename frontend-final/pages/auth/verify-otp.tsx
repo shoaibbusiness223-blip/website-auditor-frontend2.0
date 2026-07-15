@@ -119,7 +119,7 @@ export default function VerifyOtpPage() {
     setResending(true)
     setError('')
     try {
-      const res = await fetch(`${API_URL}/api/auth/resend-otp`, {
+      const res: Response = await fetch(`${API_URL}/api/auth/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
