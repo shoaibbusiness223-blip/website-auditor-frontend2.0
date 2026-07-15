@@ -110,35 +110,32 @@ export default function VerifyOtpPage() {
     if (pendingSession) {
       const session = JSON.parse(pendingSession)
       localStorage.setItem('growthauditor_access_token', session.access_token)
-      sessionStorage.removeItem('pending_session')
-    }
-  }
-
-  async function handleResend() {
-    if (!user_id || !email || !type || resendCooldown > 0) return
-    setResending(true)
-    setError('')
-    try {
-      const res: Response = await fetch(`${API_URL}/api/auth/resend-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-
-      const data = await res.json()
-      if (data.success) {
-        setResendCooldown(60)
-        setSuccess('New code sent to your email.')
-        setTimeout(() => setSuccess(''), 3000)
-      } else {
-        setError(data.error || 'Failed to resend')
+     
+      async function handleResend() {
+        if (!email || resendCooldown > 0) return
+        setResending(true)
+        setError('')
+        try {
+          const res = await fetch(`${API_URL}/api/auth/resend-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          })
+          const data = await res.json()
+          if (data.success) {
+            setResendCooldown(60)
+            setSuccess('New code sent to your email.')
+            setTimeout(() => setSuccess(''), 3000)
+          } else {
+            setError(data.error || 'Failed to resend')
+          }
+        } catch {
+          setError('Failed to resend OTP')
+        } finally {
+          setResending(false)
+        }
       }
-    } catch {
-      setError('Failed to resend OTP')
-    } finally {
-      setResending(false)
-    }
-  }
-
+  
   const title = type === 'login_2fa' ? 'Two-factor authentication' : 'Verify your email'
   const description = type === 'login_2fa'
     ? 'Enter the 6-digit code sent to your email to complete login.'
