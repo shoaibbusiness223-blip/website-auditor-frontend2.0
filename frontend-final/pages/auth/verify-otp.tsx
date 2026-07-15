@@ -7,11 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function VerifyOtpPage() {
   const router = useRouter()
-  const { user_id, email, type } = router.query as {
-    user_id?: string
-    email?: string
-    type?: 'email_verification' | 'login_2fa'
-  }
+  const { email } = router.query as { email?: string }
 
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
@@ -71,13 +67,12 @@ export default function VerifyOtpPage() {
   }
 
   async function handleVerify(fullCode: string) {
-    if (!user_id || !type) return
+    if (!email) return
     setLoading(true)
     setError('')
 
     try {
-      const endpoint = '/api/auth/verify-email'
-      const res = await fetch(`${API_URL}${endpoint}`, {
+      const res = await fetch(`${API_URL}/api/auth/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code: fullCode }),
@@ -91,7 +86,7 @@ export default function VerifyOtpPage() {
         return
       }
 
-      setSuccess(type === 'email_verification' ? 'Email verified! Redirecting...' : 'Login verified!')
+      setSuccess('Email verified! Redirecting...')
 
       if (data.data?.session?.access_token) {
         localStorage.setItem('growthauditor_access_token', data.data.session.access_token)
@@ -105,41 +100,30 @@ export default function VerifyOtpPage() {
     }
   }
 
-  if (type === 'email_verification') {
-    const pendingSession = sessionStorage.getItem('pending_session')
-    if (pendingSession) {
-      const session = JSON.parse(pendingSession)
-      localStorage.setItem('growthauditor_access_token', session.access_token)
-     
-      async function handleResend() {
-        if (!email || resendCooldown > 0) return
-        setResending(true)
-        setError('')
-        try {
-          const res = await fetch(`${API_URL}/api/auth/resend-otp`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
-          })
-          const data = await res.json()
-          if (data.success) {
-            setResendCooldown(60)
-            setSuccess('New code sent to your email.')
-            setTimeout(() => setSuccess(''), 3000)
-          } else {
-            setError(data.error || 'Failed to resend')
-          }
-        } catch {
-          setError('Failed to resend OTP')
-        } finally {
-          setResending(false)
-        }
+  async function handleResend() {
+    if (!email || resendCooldown > 0) return
+    setResending(true)
+    setError('')
+    try {
+      const res = await fetch(`${API_URL}/api/auth/resend-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setResendCooldown(60)
+        setSuccess('New code sent to your email.')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError(data.error || 'Failed to resend')
       }
-  
-  const title = type === 'login_2fa' ? 'Two-factor authentication' : 'Verify your email'
-  const description = type === 'login_2fa'
-    ? 'Enter the 6-digit code sent to your email to complete login.'
-    : 'Enter the 6-digit code we sent to your email to verify your account.'
+    } catch {
+      setError('Failed to resend OTP')
+    } finally {
+      setResending(false)
+    }
+  }
 
   return (
     <>
@@ -163,8 +147,8 @@ export default function VerifyOtpPage() {
             </svg>
           </div>
 
-          <h1 className="mb-1 text-lg font-semibold text-white">{title}</h1>
-          <p className="mb-2 text-sm text-slate-400">{description}</p>
+          <h1 className="mb-1 text-lg font-semibold text-white">Verify your email</h1>
+          <p className="mb-2 text-sm text-slate-400">Enter the 6-digit code we sent to your email to verify your account.</p>
           {email && (
             <p className="mb-6 text-xs text-slate-500">
               Code sent to <span className="text-slate-300">{email}</span>
