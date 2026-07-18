@@ -88,11 +88,8 @@ export default function VerifyOtpPage() {
 
       setSuccess('Email verified! Redirecting...')
 
-      if (data.data?.session?.access_token) {
-        localStorage.setItem('growthauditor_access_token', data.data.session.access_token)
-      }
-
-      setTimeout(() => router.push('/dashboard'), 1200)
+      setTimeout(() => router.push(`/login?verified=true&email=${encodeURIComponent(email || '')}`), 1200)
+     
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
